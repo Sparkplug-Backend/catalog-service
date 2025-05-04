@@ -1,6 +1,7 @@
 package com.sparkplug.catalog.presentation.advice;
 
 import com.sparkplug.common.exception.ApplicationException;
+import io.jsonwebtoken.security.SignatureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ProblemDetail;
@@ -23,7 +24,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler({
             AuthenticationException.class,
-            AuthorizationDeniedException.class
+            AuthorizationDeniedException.class,
+            SignatureException.class
     })
     public ProblemDetail handleAuthenticationException(RuntimeException e) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, e.getMessage());

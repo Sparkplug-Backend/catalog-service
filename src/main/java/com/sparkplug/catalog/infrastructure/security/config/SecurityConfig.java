@@ -1,6 +1,7 @@
 package com.sparkplug.catalog.infrastructure.security.config;
 
 import com.sparkplug.commonauthentication.contract.PublicKeyProvider;
+import com.sparkplug.commonauthentication.filter.ExceptionHandlerFilter;
 import com.sparkplug.commonauthentication.filter.JwtFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,6 +13,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -19,7 +21,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity, JwtFilter jwtFilter) throws Exception {
+    public SecurityFilterChain securityFilterChain(
+            HttpSecurity httpSecurity, JwtFilter jwtFilter, ExceptionHandlerFilter exceptionHandlerFilter) throws Exception {
         httpSecurity
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorizeRequest -> authorizeRequest
@@ -28,13 +31,9 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(exceptionHandlerFilter, LogoutFilter.class)
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return httpSecurity.build();
-    }
-
-    @Bean
-    JwtFilter jwtFilter(PublicKeyProvider publicKeyProvider) {
-        return new JwtFilter(publicKeyProvider);
     }
 }

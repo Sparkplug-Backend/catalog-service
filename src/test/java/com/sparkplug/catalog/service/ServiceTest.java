@@ -98,6 +98,13 @@ public class ServiceTest {
                             .build()
             );
 
+            modification.setDrivetrain(
+                    Drivetrain.builder()
+                            .type("AWD")
+                            .modification(modification)
+                            .build()
+            );
+
             em.persist(modification);
 
             return modification.getId();
